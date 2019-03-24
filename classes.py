@@ -40,6 +40,7 @@ class Player(GameObjet):
         self.timer_invinsible = 0
 
     def addForce(self, x, y):
+# TO DO
         new_vel_x = self.vel_x + x
         new_vel_y = self.vel_y + y
         if new_vel_x < -self.vel_x_max:
@@ -128,6 +129,7 @@ class Enemy(GameObjet):
         self.hp = 3
 
     def update(self):
+#Update the positio & the angle of the object. Also check if the object is still alive
         self.lookAt(self.target.x,self.target.y)
         x = self.speed*math.cos(self.angle)
         y = -self.speed*math.sin(self.angle)
@@ -138,6 +140,7 @@ class Enemy(GameObjet):
             ressources.enemyDieE.play()
 
     def draw(self, win):
+
         f.blitRotate(win, self.image, (self.x, self.y),
                 (self.width/2, self.height/2), 0)
         #pygame.draw.rect(win, (255,255,255), (self.x, self.y, self.width, self.height))
@@ -227,8 +230,9 @@ class Boss(EnemyShooter):
         self.y += self.height/2
         self.behavior = 0
         self.timer = 60
+        self.fact = 0
 
-    def shoot(self):
+    def octoShoot(self):
         fact = (math.pi/360) * random.randint(0,90)
         for i in range(8):
             bull = EnemyBullet(self.x - self.width/2, self.y-self.height/2
@@ -243,7 +247,7 @@ class Boss(EnemyShooter):
         #pygame.draw.rect(win, (255,255,255), (self.x - self.width, self.y - self.height, self.width, self.height))
     def spine(self, i):
         bull = EnemyBullet(self.x - self.width/2, self.y-self.height/2
-                ,i*math.pi/4, i*45)
+                ,self.fact + i*math.pi/4, self.fact + i*45)
         self.bullets.append(bull)
 
     def update(self):
@@ -256,18 +260,25 @@ class Boss(EnemyShooter):
             self.exist = False
             ressources.enemyDieE.play()
 
-        if self.start_hp*2/3 <= self.hp and self.behavior < 1:
+        if self.start_hp*2/3 >= self.hp and self.behavior < 1:
             self.timer = 20
             self.behavior = 1
 
-        self.counter += 1
-        if self.behavior < 2:
-            if self.counter >= self.timer:
-                self.shoot()
-                self.counter = 0
-        else:
-            self.spine(count/2)
+        elif self.start_hp/2 >= self.hp and self.behavior < 2:
+            self.timer = 30
+            self.behavior = 2
 
+        self.counter += 1
+        if self.counter >= self.timer and self.behavior < 2:
+            self.octoShoot()
+            self.counter = 0
+
+        if self.behavior == 2:
+            if self.counter <= 20:
+                self.spine(self.counter/2)
+            if self.counter >= self.timer:
+                self.counter = 0
+                self.fact = (math.pi/360) * random.randint(0,90)
 
         to_remove = []
         for b in self.bullets:

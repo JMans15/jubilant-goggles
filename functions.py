@@ -50,6 +50,7 @@ def testColide(player, enemies, blyat, e_blyat, win):
 
 
 def collide(e, b):
+    #Process collisions
     self_x_min = e.x - e.width
     self_x_max = e.x
     self_y_min = e.y - e.height
@@ -68,6 +69,7 @@ def collide(e, b):
     return cond_x_1 and cond_x_2 and cond_y_1 and cond_y_2
 
 def generateEnemy(w,h,enemies,target, type):
+    #Create an "Enemy" or "Enemy "object that will chase the target.
     side = r.randint(0,3)
     if side == 0:
         x = -20
@@ -87,6 +89,7 @@ def generateEnemy(w,h,enemies,target, type):
         enemies.append(classes.EnemyShooter(x,y,target))
 
 def generateBoss(wave,w,h,target,win,enemies, gameManager):
+    #Create a "Boss" object that will chase a target
     ressources.spawnBossE.play()
     side = r.randint(0,3)
     if side == 0:

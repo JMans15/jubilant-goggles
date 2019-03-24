@@ -8,13 +8,16 @@ disp.init()
 
 #musics
 def getSound(name):
+#Takes the corresponding music in the ressources folder
     return mix.music.load(f'Ressources\\{name}.mp3')
 
 def getEffect(name):
+#Takes the corresponding SFX in the ressource folder
     return mix.Sound(f'Ressources\\{name}.wav')
 
 #images
 def getImg(name):
+#Takes the corresponding picture in the ressources folder
     return img.load(f"Ressources\\{name}.png")
 scale = pg.transform.scale
 
