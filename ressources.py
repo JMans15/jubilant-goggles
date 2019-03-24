@@ -2,23 +2,23 @@ import pygame.image as img
 import pygame.mixer as mix
 import pygame.display as disp
 import pygame as pg
-
+import os
 mix.init()
 disp.init()
 
 #musics
 def getSound(name):
 #Takes the corresponding music in the ressources folder
-    return mix.music.load(f'Ressources\\{name}.mp3')
+    return mix.music.load(os.path.join("Ressources",f'{name}.mp3'))
 
 def getEffect(name):
 #Takes the corresponding SFX in the ressource folder
-    return mix.Sound(f'Ressources\\{name}.wav')
+    return mix.Sound(os.path.join("Ressources",f'{name}.wav'))
 
 #images
 def getImg(name):
 #Takes the corresponding picture in the ressources folder
-    return img.load(f"Ressources\\{name}.png")
+    return img.load(os.path.join("Ressources",f"{name}.png"))
 scale = pg.transform.scale
 
 pouceI = scale(getImg('pouce-bleu'),(40,40))
