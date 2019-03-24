@@ -30,6 +30,7 @@ r_circleI = getImg('r_cercle')
 scared_smileyI = scale(getImg('smiley'), (40,40))
 bossI = pg.transform.scale(getImg('boss'),(160,160))
 iconeI = getImg("icone")
+bckgI = scale(getImg("bckg"),(800,600))
 
 shootE = getEffect("shoot")
 enemyDieE = getEffect("enemy_death")

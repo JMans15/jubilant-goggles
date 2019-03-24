@@ -4,6 +4,7 @@ import ressources
 import functions as f
 import random
 
+#====================GameObject======================
 class GameObjet:
     def __init__(self, x, y, w, h, image):
         self.x = x
@@ -22,6 +23,7 @@ class GameObjet:
         self.angle = -math.atan2(deltaY, deltaX)
         self.angle_deg = (180 / math.pi) * self.angle
 
+#===================Player===================
 class Player(GameObjet):
     def __init__(self, x, y, w, h):
         super().__init__(x,y,40,40,ressources.playerI)
@@ -40,7 +42,7 @@ class Player(GameObjet):
         self.timer_invinsible = 0
 
     def addForce(self, x, y):
-# TO DO
+        # ajoute de la force aux player et calcule si il peut avancer dans cette direction
         new_vel_x = self.vel_x + x
         new_vel_y = self.vel_y + y
         if new_vel_x < -self.vel_x_max:
@@ -58,12 +60,15 @@ class Player(GameObjet):
             self.vel_y = new_vel_y
 
     def decelerete_x(self):
+        # freine en x
         self.vel_x = int(self.vel_x/1.1)
 
     def decelerete_y(self):
+        # freine en y
         self.vel_y = int(self.vel_y/1.1)
 
     def shoot(self):
+        # lance une bullet
         ressources.shootE.play()
         return Bullet(self.x, self.y
                 ,self.angle, self.angle_deg)
@@ -118,6 +123,7 @@ class Player(GameObjet):
             self.exist = False
         self.lookAt(*pygame.mouse.get_pos())
 
+#====================Enemy======================================
 class Enemy(GameObjet):
     def __init__(self, x, y, target):
         super().__init__(x,y,10,10,ressources.enemyI)
@@ -129,7 +135,7 @@ class Enemy(GameObjet):
         self.hp = 3
 
     def update(self):
-#Update the positio & the angle of the object. Also check if the object is still alive
+        #Update the positio & the angle of the object. Also check if the object is still alive
         self.lookAt(self.target.x,self.target.y)
         x = self.speed*math.cos(self.angle)
         y = -self.speed*math.sin(self.angle)
@@ -143,44 +149,9 @@ class Enemy(GameObjet):
 
         f.blitRotate(win, self.image, (self.x, self.y),
                 (self.width/2, self.height/2), 0)
-        #pygame.draw.rect(win, (255,255,255), (self.x, self.y, self.width, self.height))
-        #pygame.draw.rect(win, (255,0,0), (self.x -self.width/2, self.y -self.height/2, self.width, self.height))
 
     def hit(self):
         self.hp -= 1
-
-
-class Bullet(GameObjet):
-    def __init__(self, x, y, angle, deg):
-        super().__init__(x,y,10,10, ressources.r_arrowI)
-        self.speed = 15
-        self.angle_deg = deg
-        self.width = self.image.get_width()
-        self.height = self.image.get_height()
-
-        self.vel_x = math.cos(-angle) * self.speed
-        self.vel_y = math.sin(-angle) * self.speed
-
-    def update(self):
-        self.x += self.vel_x
-        self.y += self.vel_y
-
-    def draw(self,win):
-        f.blitRotate(win, self.image, (self.x, self.y),
-                (self.width/2, self.height/2), self.angle_deg)
-        #pygame.draw.rect(win, (255,0,0), (self.x -self.width/2, self.y -self.height/2, self.width, self.height))
-
-
-class EnemyBullet(Bullet):
-    def __init__(self, x, y, angle, deg):
-        super().__init__(x, y, angle, deg)
-        self.image = ressources.pouceI.convert_alpha()
-        self.speed = 12
-
-    def draw(self, win):
-        f.blitRotate(win, self.image, (self.x, self.y),
-                (self.width/2, self.height/2), 0)
-        #pygame.draw.rect(win, (255,255,255), (self.x, self.y, self.width, self.height))
 
 
 class EnemyShooter(Enemy):
@@ -233,6 +204,7 @@ class Boss(EnemyShooter):
         self.fact = 0
 
     def octoShoot(self):
+        # tir dans 8 direction
         fact = (math.pi/360) * random.randint(0,90)
         for i in range(8):
             bull = EnemyBullet(self.x - self.width/2, self.y-self.height/2
@@ -240,17 +212,20 @@ class Boss(EnemyShooter):
             self.bullets.append(bull)
 
     def draw(self, win):
-        f.blitRotate(win, self.image, (self.x - self.width/2, self.y-self.height/2),
-                (self.width/2, self.height/2), 0)
+        # dessine
         for b in self.bullets:
             b.draw(win)
-        #pygame.draw.rect(win, (255,255,255), (self.x - self.width, self.y - self.height, self.width, self.height))
+        f.blitRotate(win, self.image, (self.x - self.width/2, self.y-self.height/2),
+                (self.width/2, self.height/2), 0)
+
     def spine(self, i):
+        # tir en cercle
         bull = EnemyBullet(self.x - self.width/2, self.y-self.height/2
                 ,self.fact + i*math.pi/4, self.fact + i*45)
         self.bullets.append(bull)
 
     def update(self):
+        #met a jour le position , les attaques, et les bullets.
         self.lookAt(self.target.x,self.target.y)
         x = self.speed*math.cos(self.angle)
         y = -self.speed*math.sin(self.angle)
@@ -286,6 +261,38 @@ class Boss(EnemyShooter):
             if not b.exist:
                 to_remove.append(b)
 
+#=================Bullet======================================================
+class Bullet(GameObjet):
+    def __init__(self, x, y, angle, deg):
+        super().__init__(x,y,10,10, ressources.r_arrowI)
+        self.speed = 15
+        self.angle_deg = deg
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
+
+        self.vel_x = math.cos(-angle) * self.speed
+        self.vel_y = math.sin(-angle) * self.speed
+
+    def update(self):
+        self.x += self.vel_x
+        self.y += self.vel_y
+
+    def draw(self,win):
+        f.blitRotate(win, self.image, (self.x, self.y),
+                (self.width/2, self.height/2), self.angle_deg)
+
+
+class EnemyBullet(Bullet):
+    def __init__(self, x, y, angle, deg):
+        super().__init__(x, y, angle, deg)
+        self.image = ressources.pouceI.convert_alpha()
+        self.speed = 12
+
+    def draw(self, win):
+        f.blitRotate(win, self.image, (self.x, self.y),
+                (self.width/2, self.height/2), 0)
+
+#=================Sort==================================================
 class Sort:
     def __init__(self, cld):
         self.cooldown = cld
@@ -339,8 +346,10 @@ class ScaredSmiley(Sort):
             else:
                 win.blit(ressources.scared_smileyI,(e.x-50,e.y-50))
 
+#=========GameManager=======================================================
 class GameManager:
     def __init__(self):
+        # Controller des timers
         self.isWarning = False
         self.counter_w = 0
         self.waveClear = False

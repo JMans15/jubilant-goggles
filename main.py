@@ -1,3 +1,5 @@
+#23-24 Mars 2019  Game Jam 2.0
+
 import pygame as pg
 import classes
 import ressources
@@ -16,10 +18,12 @@ pg.display.set_caption("La vague 126 vas vous surprendre !!! Je n'y aurai jamais
 pg.display.set_icon(ressources.iconeI.convert_alpha())
 clock = pg.time.Clock()
 gameManager = classes.GameManager()
+bckgrd = ressources.bckgI.convert()
 
 run = True
 gameRunning = True
 while run:
+    #Initialisation du jeu
     gameOverRun = True
 
     player = classes.Player(w/2,h/2, w, h)
@@ -30,9 +34,11 @@ while run:
     circle = classes.Circle()
     scared = classes.ScaredSmiley()
 
-    win.fill((177, 201, 239))
+    #Affiche le background
+    win.blit(bckgrd, (0,0))
     pg.display.flip()
-    wave = 9
+
+    wave = 1
     waveFinished = False
     counter = 0
     num_enemy = 0
@@ -40,13 +46,17 @@ while run:
     target_scared = []
     isWaveBoss = False
 
+    #Debut du jeu
     while gameRunning:
 
+        #La queues des events
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 run = False
                 gameRunning = False
                 gameOverRun = False
+
+            #Keys pour lancer les sorts
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_1 and omg.wait == 0:
                     omg.omgTime = 100
@@ -60,10 +70,14 @@ while run:
                     target_scared = list(enemies)
                     scared.wait = scared.cooldown
 
+        #Tir du joueur
         if pg.mouse.get_pressed()[0] and cooldown <= 0:
             blyat.append(player.shoot())
             cooldown = 1/player.fireRate
 
+        #Controlle des vagues
+
+        #Vague fini
         if waveFinished:
             ressources.waveClearE.play()
             gameManager.waveClear = True
@@ -75,9 +89,12 @@ while run:
                 wave = 26
             waveFinished = False
             if wave % 10 == 0: isWaveBoss = True
-            #print("Wave finish", num_enemy, enemies)
+
+        #Vague en cour
         else:
+            #Test si il y a encore des enemis en vie ou a cree
             if num_enemy <= 0 and len(enemies) == 0:
+                #Vague de boss
                 if isWaveBoss:
                     print(wave, num_enemy)
                     f.generateBoss(wave,w,h,player,win,enemies, gameManager)
@@ -89,6 +106,7 @@ while run:
                     num_enemy = 2*round(math.sqrt(wave))
                     f.generateEnemy(w,h,enemies,player, 0)
 
+            #regarde si il doit cree des enemis
             if num_enemy > 0 and counter % 20 == 0:
                 print(num_enemy)
                 f.generateEnemy(w,h,enemies,player, random.randint(0,1))
@@ -97,6 +115,7 @@ while run:
         counter += 1
         if cooldown >= 0: cooldown -= 1
 
+        #recolte les instance de bullet chez les enemis
         enemies_blyat = []
         for e in enemies:
             try:
@@ -104,14 +123,20 @@ while run:
             except:
                 pass
 
-        win.fill((177, 201, 239))
+        #dessine le background
+        win.blit(bckgrd, (0,0))
 
+        #verifie les collisions
         f.testColide(player, enemies, blyat, enemies_blyat, win)
 
+        #test si le player est en vie
         if player.dead():
             gameRunning = False
 
+
         to_remove = []
+
+        #Updates et draw toute les objets
         for gameObjects in ([player],enemies,blyat):
             for go in gameObjects:
                 go.update()
@@ -119,6 +144,7 @@ while run:
                 if not go.exist:
                     to_remove.append(go)
 
+        #Supprime les refferences des objet mort
         for go in to_remove:
             for gameObjects in (enemies,blyat):
                 try:
@@ -133,21 +159,28 @@ while run:
                             pass
 
 
-
+        #fait les sort
         omg.effet(player, win)
         circle.effet(target_circle, win,w,h)
         scared.effet(target_scared, win)
+
+        #Les affichages des textes
+
+        #Annonce des vagues de boss
         if gameManager.isWarning:
             gameManager.counter_w += 1
             f.texts(f"Vague {wave} : SA TOURNE MAL",0,0,win,h//20,w,h, milieu = True)
             if gameManager.counter_w >= 30:
                 gameManager.isWarning = False
+
+        #Annonce des vagues
         elif gameManager.waveClear:
             gameManager.counter_wc += 1
             f.texts(f"Vague {wave}",h*1//3,h*2//3,win,h//20,w,h,milieu = True)
             if gameManager.counter_wc >= 20:
                 gameManager.waveClear = False
 
+        #GUI
         f.texts(f"Vies: {player.hp}",w-100,10,win,30)
         f.texts(f"Vague {wave}",10,10,win,50)
         if omg.wait != 0:
@@ -163,9 +196,12 @@ while run:
         else:
             f.texts('3 - Scared Smiley OK',w-200,h-30,win,20)
         clock.tick(30)
+
+        #Met a jour l'ecran
         pg.display.flip()
 
 
+    #GameOver
     while gameOverRun:
         for event in pg.event.get():
             if event.type == pg.QUIT:
