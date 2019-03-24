@@ -39,7 +39,7 @@ while run:
     pg.display.flip()
 
     #vagues
-    wave = 1
+    wave = 0
     waveFinished = False
 
     #enemis a faire spawn

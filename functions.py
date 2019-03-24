@@ -3,6 +3,7 @@ import pygame.font as font
 import random as r
 import math, classes
 import ressources
+import os
 
 def blitRotate(surf, image, pos, originPos, angle):
 
@@ -112,7 +113,7 @@ def generateBoss(wave,w,h,target,win,enemies, gameManager):
 
 def texts(txt,Xpos,Ypos,win,fontSize,w=0,h=0,milieu = False):
 #Locate txt on pos in win with the asked font size
-   Pol = font.Font("ressources\\impact.ttf",fontSize)
+   Pol = font.Font(os.path.join("Ressources","impact.ttf"),fontSize)
    scoretext = Pol.render(str(txt), 1,(0,0,0))
    text_width = scoretext.get_width()
    if milieu == True:
