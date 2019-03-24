@@ -38,12 +38,18 @@ while run:
     win.blit(bckgrd, (0,0))
     pg.display.flip()
 
+    #vagues
     wave = 1
     waveFinished = False
-    counter = 0
+
+    #enemis a faire spawn
+    counter_spawn = 0
     num_enemy = 0
+
+    #liste des cible affecter part les sort
     target_circle = []
     target_scared = []
+
     isWaveBoss = False
 
     #Debut du jeu
@@ -102,17 +108,17 @@ while run:
                 else:
                     #print(num_enemy, enemies)
                     waveFinished = True
-                    counter = 0
+                    counter_spawn = 0
                     num_enemy = 2*round(math.sqrt(wave))
                     f.generateEnemy(w,h,enemies,player, 0)
 
             #regarde si il doit cree des enemis
-            if num_enemy > 0 and counter % 20 == 0:
+            if num_enemy > 0 and counter_spawn % 20 == 0:
                 print(num_enemy)
                 f.generateEnemy(w,h,enemies,player, random.randint(0,1))
                 num_enemy -= 1
 
-        counter += 1
+        counter_spawn += 1
         if cooldown >= 0: cooldown -= 1
 
         #recolte les instance de bullet chez les enemis
